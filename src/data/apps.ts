@@ -1,128 +1,138 @@
-export type AppStatus = 'live' | 'beta' | 'building' | 'idea'
+/**
+ * THE ORBIT 360 APP LIST
+ * ----------------------
+ * This file is the single source of truth for which apps appear in Orbit 360.
+ * Visitors cannot add or change apps. To add, edit or remove an app:
+ *   1. Edit the SUITE list below.
+ *   2. Commit and push to GitHub. Vercel redeploys automatically.
+ */
+
+export type AppStatus = 'live' | 'beta' | 'building'
+export type Tone = 'blue' | 'green' | 'orange' | 'gold' | 'plum' | 'teal'
+export type Pillar = 'outcomes' | 'records' | 'insights' | 'tracking'
 
 export interface OrbitApp {
-  id: string
+  id: string // used in the page address: /apps/<id>
   name: string
-  short: string // 2–3 letter monogram
-  url: string
+  short: string // 2-letter monogram shown when there is no logo
+  url: string // leave '' while the app is not live yet
+  tagline: string // one line
   description: string
   category: string
   status: AppStatus
-  color: string // accent hex
-  logo?: string // path or data URL
-  pinned?: boolean
-  builtIn?: boolean
-  tags?: string[]
+  tone: Tone // accent color
+  pillars: Pillar[] // which ORBIT areas the app supports
+  logo?: string // file in /public/logos
+  featured?: boolean
 }
 
-export const STATUS_META: Record<AppStatus, { label: string; color: string }> = {
-  live: { label: 'Live', color: '#6CC04A' },
-  beta: { label: 'Beta', color: '#38BDF8' },
-  building: { label: 'In development', color: '#F58220' },
-  idea: { label: 'Idea', color: '#A78BFA' },
+export const STATUS_LABEL: Record<AppStatus, string> = {
+  live: 'Live',
+  beta: 'Beta',
+  building: 'In development',
 }
+export const STATUS_TONE: Record<AppStatus, Tone> = { live: 'green', beta: 'blue', building: 'orange' }
 
-export const CATEGORIES = [
-  'Programs',
-  'Education',
-  'Media',
-  'Facilities',
-  'Engagement',
-  'Organization',
-  'Insights',
-  'Other',
-]
-
-export const BRAND_COLORS = ['#1E5BD8', '#6CC04A', '#F58220', '#FCD34D', '#38BDF8', '#A78BFA', '#F43F5E', '#14B8A6']
-
-export const SEED_APPS: OrbitApp[] = [
+export const SUITE: OrbitApp[] = [
   {
-    id: 'eys-camp',
+    id: 'summer-camp',
     name: 'Extraordinary Youth Summer Camp',
     short: 'EY',
     url: 'https://eyscorbitcampmanagement.vercel.app/',
-    description: 'Camp management for the Extraordinary Youth summer program — registrations, campers, schedules and daily tracking.',
+    tagline: 'Camp management for the Extraordinary Youth summer program.',
+    description:
+      'Registrations, campers, schedules and day-to-day tracking for the Extraordinary Youth Summer Camp, in one place for staff and families.',
     category: 'Programs',
     status: 'live',
-    color: '#F58220',
-    pinned: true,
-    builtIn: true,
-    tags: ['youth', 'camp', 'tracking'],
+    tone: 'orange',
+    pillars: ['outcomes', 'records', 'tracking'],
+    featured: true,
   },
   {
     id: 'ignite-academy',
     name: 'Ignite Academy',
     short: 'IA',
     url: 'https://igniteacademy-orcin.vercel.app/',
-    description: 'Learning platform for Ignite Academy — courses, learners and progress in one place.',
+    tagline: 'Learning platform for courses, learners and progress.',
+    description: 'Ignite Academy brings courses, learners and their progress together, so every student’s growth is visible.',
     category: 'Education',
     status: 'live',
-    color: '#22C55E',
+    tone: 'green',
+    pillars: ['outcomes', 'tracking'],
     logo: '/logos/ignite.png',
-    pinned: true,
-    builtIn: true,
-    tags: ['learning', 'courses'],
+    featured: true,
   },
   {
-    id: 'cm2-presence',
+    id: 'digital-presence',
     name: 'CM2 Digital Presence',
     short: 'DP',
     url: 'https://cm-2-digital-presence.vercel.app/',
-    description: 'The digital presence hub for Community Matters 2 — brand, social and outreach in one view.',
+    tagline: 'Brand, social and outreach for Community Matters 2.',
+    description: 'The digital presence hub for Community Matters 2: how the organization shows up online, across brand, social and outreach.',
     category: 'Media',
     status: 'live',
-    color: '#1E5BD8',
-    builtIn: true,
-    tags: ['brand', 'social'],
+    tone: 'blue',
+    pillars: ['insights'],
   },
   {
     id: 'community-center',
     name: 'CM2 Community Center',
     short: 'CC',
     url: '',
-    description: '2D and 3D block model of the CM2 Community Center — explore the space before it is built.',
+    tagline: '2D and 3D block model of the future Community Center.',
+    description: 'An interactive 2D and 3D block model of the CM2 Community Center, so the community can explore the space before it is built.',
     category: 'Facilities',
     status: 'building',
-    color: '#FCD34D',
-    builtIn: true,
-    tags: ['2d', '3d', 'facility'],
+    tone: 'gold',
+    pillars: ['records'],
   },
   {
-    id: 'cm2-survey',
+    id: 'community-survey',
     name: 'Community Input Survey',
     short: 'CS',
     url: 'https://cm2-survey.vercel.app/',
-    description: 'Collect community voice — a survey that feeds what the Community Center should become.',
+    tagline: 'Tell us what the Community Center should become.',
+    description: 'A survey that collects the community’s voice and shapes what the Community Center offers.',
     category: 'Engagement',
     status: 'live',
-    color: '#6CC04A',
-    pinned: true,
-    builtIn: true,
-    tags: ['survey', 'feedback'],
+    tone: 'teal',
+    pillars: ['insights'],
+    featured: true,
   },
   {
     id: 'opinion-wall',
     name: 'Opinion Live Wall',
     short: 'LW',
     url: 'https://cm2-survey.vercel.app/display',
-    description: 'A live display wall of community opinions about the Community Center, updated as responses arrive.',
+    tagline: 'Community opinions, displayed live.',
+    description: 'A live wall that shows community opinions about the Community Center as responses arrive.',
     category: 'Engagement',
     status: 'live',
-    color: '#38BDF8',
-    builtIn: true,
-    tags: ['live', 'display'],
+    tone: 'plum',
+    pillars: ['insights'],
   },
   {
     id: 'cm2-website',
     name: 'CM2 Website',
     short: 'CM',
     url: 'https://www.communitymatters2.org/',
-    description: 'The official Community Matters 2 website — mission, programs and ways to get involved.',
+    tagline: 'The official home of Community Matters 2.',
+    description: 'The official Community Matters 2 website: our mission, programs and ways to get involved.',
     category: 'Organization',
     status: 'live',
-    color: '#A78BFA',
+    tone: 'blue',
+    pillars: ['records'],
     logo: '/logos/cm2.png',
-    builtIn: true,
-    tags: ['website', 'public'],
   },
 ]
+
+export const PILLARS: { key: Pillar; letter: string; title: string; tone: Tone; text: string }[] = [
+  { key: 'outcomes', letter: 'O', title: 'Outcomes', tone: 'blue', text: 'What changes for the youth and families we serve, measured over time.' },
+  { key: 'records', letter: 'R', title: 'Records', tone: 'green', text: 'One trusted home for people, programs and places.' },
+  { key: 'insights', letter: 'BI', title: 'Behavioral Insights', tone: 'orange', text: 'What the community tells us, and how it engages.' },
+  { key: 'tracking', letter: 'T', title: 'Tracking', tone: 'teal', text: 'Every camp day, course and project followed from start to finish.' },
+]
+
+export const tone = (t: Tone, alpha = 1) => `rgb(var(--a-${t}) / ${alpha})`
+export const indexOf = (app: OrbitApp) => String(SUITE.indexOf(app) + 1).padStart(2, '0')
+export const findApp = (id?: string) => SUITE.find((a) => a.id === id)

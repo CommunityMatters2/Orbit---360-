@@ -1,14 +1,14 @@
-import { STATUS_META, type AppStatus } from '../data/apps'
+import { STATUS_LABEL, STATUS_TONE, tone, type AppStatus } from '../data/apps'
 
 export default function StatusBadge({ status }: { status: AppStatus }) {
-  const m = STATUS_META[status]
+  const t = STATUS_TONE[status]
   return (
-    <span className="chip" style={{ color: m.color, background: `${m.color}1f`, border: `1px solid ${m.color}40` }}>
+    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em]" style={{ color: tone(t) }}>
       <span className="relative flex h-1.5 w-1.5">
-        {status === 'live' && <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70" style={{ background: m.color }} />}
-        <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: m.color }} />
+        {status === 'live' && <span className="absolute inset-0 animate-ping rounded-full opacity-60" style={{ background: tone(t) }} />}
+        <span className="relative h-1.5 w-1.5 rounded-full" style={{ background: tone(t) }} />
       </span>
-      {m.label}
+      {STATUS_LABEL[status]}
     </span>
   )
 }

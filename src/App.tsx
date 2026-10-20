@@ -1,39 +1,37 @@
-import { Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import { useApps } from './store/useApps'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Shell from './components/Shell'
-import Starfield from './components/Starfield'
-import AppDrawer from './components/AppDrawer'
-import AppFormModal from './components/AppFormModal'
 import CommandPalette from './components/CommandPalette'
 import Home from './pages/Home'
 import Apps from './pages/Apps'
+import AppDetail from './pages/AppDetail'
 import Insights from './pages/Insights'
-import Lab from './pages/Lab'
-import Settings from './pages/Settings'
+import Roadmap from './pages/Roadmap'
 import Embed from './pages/Embed'
+import NotFound from './pages/NotFound'
 
 export default function App() {
-  const { theme } = useApps()
-  const { pathname } = useLocation()
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+  const { pathname, hash } = useLocation()
+
+  // Scroll to top on page change. Braces matter: browsers can return a value
+  // from scrollTo, and React would mistake it for a cleanup function.
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0)
+  }, [pathname, hash])
 
   return (
     <>
-      <Starfield theme={theme} />
       <Shell>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/apps" element={<Apps />} />
+          <Route path="/apps/:id" element={<AppDetail />} />
           <Route path="/insights" element={<Insights />} />
-          <Route path="/lab" element={<Lab />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/roadmap" element={<Roadmap />} />
           <Route path="/open/:id" element={<Embed />} />
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Shell>
-      <AppDrawer />
-      <AppFormModal />
       <CommandPalette />
     </>
   )

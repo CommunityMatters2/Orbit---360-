@@ -1,137 +1,118 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CornerDownLeft, FlaskConical, Home, LayoutGrid, LineChart, Moon, Plus, Search, Settings } from 'lucide-react'
-import { useApps } from '../store/useApps'
+import { ArrowUpRight, CornerDownLeft, Search } from 'lucide-react'
+import { indexOf, SUITE } from '../data/apps'
+import { useUI } from '../ui'
 import AppIcon from './AppIcon'
-import Modal from './Modal'
 
-interface Item {
-  id: string
-  label: string
-  hint: string
-  icon: ReactNode
-  run: () => void
-  group: 'Apps' | 'Actions'
-}
+const PAGES = [
+  { label: 'Suite overview', to: '/' },
+  { label: 'All apps', to: '/apps' },
+  { label: 'Insights', to: '/insights' },
+  { label: 'Roadmap', to: '/roadmap' },
+]
+
+type Row = { key: string; label: string; sub: string; go: () => void; app?: (typeof SUITE)[number] }
 
 export default function CommandPalette() {
-  const { apps, paletteOpen, setPaletteOpen, launch, setEditing, toggleTheme } = useApps()
+  const { searchOpen, setSearchOpen } = useUI()
   const nav = useNavigate()
   const [q, setQ] = useState('')
   const [idx, setIdx] = useState(0)
-  const listRef = useRef<HTMLDivElement>(null)
+  const input = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
-        setPaletteOpen(!paletteOpen)
+        setSearchOpen(!searchOpen)
+      } else if (e.key === 'Escape') {
+        setSearchOpen(false)
       }
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [paletteOpen, setPaletteOpen])
+    return () => {
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [searchOpen, setSearchOpen])
 
   useEffect(() => {
-    if (paletteOpen) {
+    if (searchOpen) {
       setQ('')
       setIdx(0)
+      requestAnimationFrame(() => input.current?.focus())
     }
-  }, [paletteOpen])
+  }, [searchOpen])
 
-  const close = () => setPaletteOpen(false)
-
-  const items = useMemo<Item[]>(() => {
-    const go = (path: string) => () => nav(path)
-    const actions: Item[] = [
-      { id: 'a-add', label: 'Add a new app', hint: 'Create', icon: <Plus size={16} />, run: () => setEditing('new'), group: 'Actions' },
-      { id: 'a-home', label: 'Go to Home', hint: 'Navigate', icon: <Home size={16} />, run: go('/'), group: 'Actions' },
-      { id: 'a-apps', label: 'Go to All Apps', hint: 'Navigate', icon: <LayoutGrid size={16} />, run: go('/apps'), group: 'Actions' },
-      { id: 'a-ins', label: 'Go to Insights', hint: 'Navigate', icon: <LineChart size={16} />, run: go('/insights'), group: 'Actions' },
-      { id: 'a-lab', label: 'Go to Orbit Lab', hint: 'Navigate', icon: <FlaskConical size={16} />, run: go('/lab'), group: 'Actions' },
-      { id: 'a-set', label: 'Go to Settings', hint: 'Navigate', icon: <Settings size={16} />, run: go('/settings'), group: 'Actions' },
-      { id: 'a-theme', label: 'Toggle light / dark', hint: 'Theme', icon: <Moon size={16} />, run: toggleTheme, group: 'Actions' },
-    ]
-    const appItems: Item[] = apps.map((a) => ({
-      id: a.id,
-      label: a.name,
-      hint: a.url ? 'Launch' : 'Details',
-      icon: <AppIcon app={a} size={26} />,
-      run: () => (a.url ? launch(a) : nav('/apps')),
-      group: 'Apps',
-    }))
-    const all = [...appItems, ...actions]
+  const rows = useMemo<Row[]>(() => {
     const s = q.trim().toLowerCase()
-    if (!s) return all
-    return all.filter((i) => {
-      const app = apps.find((a) => a.id === i.id)
-      const hay = [i.label, app?.category, app?.description, ...(app?.tags || [])].join(' ').toLowerCase()
-      return hay.includes(s)
-    })
-  }, [apps, q, nav, launch, setEditing, toggleTheme])
+    const apps: Row[] = SUITE.filter((a) => !s || [a.name, a.category, a.tagline].join(' ').toLowerCase().includes(s)).map((a) => ({
+      key: a.id,
+      label: a.name,
+      sub: `${indexOf(a)} · ${a.category}`,
+      go: () => nav(`/apps/${a.id}`),
+      app: a,
+    }))
+    const pages: Row[] = PAGES.filter((p) => !s || p.label.toLowerCase().includes(s)).map((p) => ({ key: p.to, label: p.label, sub: 'Page', go: () => nav(p.to) }))
+    return [...apps, ...pages]
+  }, [q, nav])
 
-  useEffect(() => setIdx(0), [q])
   useEffect(() => {
-    listRef.current?.querySelector(`[data-idx="${idx}"]`)?.scrollIntoView({ block: 'nearest' })
-  }, [idx])
+    setIdx(0)
+  }, [q])
 
-  const run = (i?: Item) => {
-    if (!i) return
-    close()
-    i.run()
+  if (!searchOpen) return null
+
+  const run = (r?: Row) => {
+    if (!r) return
+    setSearchOpen(false)
+    r.go()
   }
 
-  let lastGroup = ''
   return (
-    <Modal open={paletteOpen} onClose={close} side="top" className="w-full max-w-xl">
-      <div className="overflow-hidden rounded-2xl border border-soft shadow-2xl" style={{ background: 'var(--panel-solid)' }}>
-        <div className="flex items-center gap-3 border-b border-soft px-4">
-          <Search size={18} className="text-muted" />
+    <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh]" role="dialog" aria-modal="true" aria-label="Search">
+      <div className="fade absolute inset-0 bg-ink/30 backdrop-blur-[2px]" onClick={() => setSearchOpen(false)} />
+      <div className="rise relative w-full max-w-xl overflow-hidden rounded-[10px] border rule-strong bg-surface shadow-[0_30px_80px_-30px_rgb(var(--ink)/0.6)]">
+        <div className="flex items-center gap-3 border-b rule px-4">
+          <Search size={17} className="text-muted" />
           <input
-            autoFocus
+            ref={input}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'ArrowDown') {
                 e.preventDefault()
-                setIdx((i) => Math.min(i + 1, items.length - 1))
+                setIdx((i) => Math.min(i + 1, rows.length - 1))
               } else if (e.key === 'ArrowUp') {
                 e.preventDefault()
                 setIdx((i) => Math.max(i - 1, 0))
-              } else if (e.key === 'Enter') {
-                run(items[idx])
-              }
+              } else if (e.key === 'Enter') run(rows[idx])
             }}
-            placeholder="Search apps or type a command…"
-            className="h-14 flex-1 bg-transparent text-[15px] outline-none placeholder:text-[var(--muted)]"
+            placeholder="Find an app or page"
+            className="h-14 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted"
           />
-          <kbd className="rounded-md border border-soft px-1.5 py-0.5 text-[10px] text-muted">ESC</kbd>
+          <kbd className="font-mono text-[10px] text-muted">ESC</kbd>
         </div>
-        <div ref={listRef} className="max-h-[50vh] overflow-y-auto p-2 scrollbar-thin">
-          {items.length === 0 && <div className="px-3 py-10 text-center text-sm text-muted">Nothing in orbit matches “{q}”.</div>}
-          {items.map((i, n) => {
-            const header = i.group !== lastGroup
-            lastGroup = i.group
-            return (
-              <div key={i.id}>
-                {header && <div className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{i.group}</div>}
-                <button
-                  data-idx={n}
-                  onMouseMove={() => setIdx(n)}
-                  onClick={() => run(i)}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${n === idx ? 'bg-orbit-blue/15' : ''}`}
-                >
-                  <span className="grid w-7 place-items-center text-muted">{i.icon}</span>
-                  <span className="flex-1 truncate">{i.label}</span>
-                  <span className="flex items-center gap-1 text-xs text-muted">
-                    {i.hint} {n === idx && <CornerDownLeft size={12} />}
-                  </span>
-                </button>
-              </div>
-            )
-          })}
-        </div>
+        <ul className="max-h-[52vh] overflow-y-auto p-2">
+          {rows.length === 0 && <li className="px-3 py-10 text-center text-[14px] text-muted">Nothing matches “{q}”.</li>}
+          {rows.map((r, n) => (
+            <li key={r.key}>
+              <button
+                onMouseMove={() => setIdx(n)}
+                onClick={() => run(r)}
+                className={`flex w-full items-center gap-3 rounded-[6px] px-3 py-2.5 text-left transition-colors ${n === idx ? 'bg-ink/[0.06]' : ''}`}
+              >
+                {r.app ? <AppIcon app={r.app} size={30} /> : <span className="grid h-[30px] w-[30px] place-items-center rounded-md border rule text-muted">→</span>}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[14px] font-medium">{r.label}</span>
+                  <span className="block font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">{r.sub}</span>
+                </span>
+                {n === idx && (r.app ? <ArrowUpRight size={15} className="text-muted" /> : <CornerDownLeft size={14} className="text-muted" />)}
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-    </Modal>
+    </div>
   )
 }

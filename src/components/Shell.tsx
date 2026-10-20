@@ -1,127 +1,150 @@
 import type { ReactNode } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { FlaskConical, Home, LayoutGrid, LineChart, Moon, Plus, Search, Settings, Sun } from 'lucide-react'
-import { useApps } from '../store/useApps'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { ArrowUpRight, Moon, Search, Sun } from 'lucide-react'
+import { SUITE } from '../data/apps'
+import { useUI } from '../ui'
 import OrbitMark from './OrbitMark'
 
 const NAV = [
-  { to: '/', label: 'Home', icon: Home },
-  { to: '/apps', label: 'Apps', icon: LayoutGrid },
-  { to: '/insights', label: 'Insights', icon: LineChart },
-  { to: '/lab', label: 'Lab', icon: FlaskConical },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/', label: 'Suite' },
+  { to: '/apps', label: 'Apps' },
+  { to: '/insights', label: 'Insights' },
+  { to: '/roadmap', label: 'Roadmap' },
 ]
 
-function Sidebar() {
-  const { apps } = useApps()
-  const pinned = apps.filter((a) => a.pinned)
+const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+
+function NavItem({ to, label, compact = false }: { to: string; label: string; compact?: boolean }) {
   return (
-    <aside className="glass fixed inset-y-3 left-3 z-40 hidden w-[76px] flex-col items-center rounded-3xl py-5 lg:flex">
-      <NavLink to="/" className="mb-6" aria-label="Orbit 360 home">
-        <OrbitMark size={44} />
-      </NavLink>
-      <nav className="flex flex-col gap-1.5">
-        {NAV.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `group relative grid h-12 w-12 place-items-center rounded-2xl transition ${isActive ? 'bg-orbit-blue text-white shadow-[0_8px_24px_-8px_#1E5BD8]' : 'text-muted hover:bg-white/10 hover:text-[var(--text)]'}`
-            }
+    <NavLink
+      to={to}
+      end={to === '/'}
+      className={({ isActive }) =>
+        `relative whitespace-nowrap py-1 text-[14px] font-medium transition-colors ${isActive ? 'text-ink' : 'text-muted hover:text-ink'} after:absolute ${compact ? 'after:-bottom-[11px]' : 'after:-bottom-[17px]'} after:left-0 after:h-[2px] after:bg-orange after:transition-all ${isActive ? 'after:w-full' : 'after:w-0'}`
+      }
+    >
+      {label}
+    </NavLink>
+  )
+}
+
+function Header() {
+  const { theme, toggleTheme, setSearchOpen } = useUI()
+  const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/i.test(navigator.userAgent)
+  return (
+    <header className="sticky top-0 z-50 border-b rule bg-paper/85 backdrop-blur-md">
+      <div className="hidden border-b rule sm:block">
+        <div className="wrap flex h-8 items-center justify-between font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted">
+          <span>Community Matters 2 Inc. — Orbit 360</span>
+          <span>
+            {today} · {SUITE.filter((a) => a.status === 'live').length} apps live
+          </span>
+        </div>
+      </div>
+      <div className="wrap flex h-16 items-center gap-6">
+        <Link to="/" className="flex items-center gap-2.5 text-ink" aria-label="Orbit 360 home">
+          <OrbitMark size={30} />
+          <span className="font-display text-[21px] font-semibold tracking-tight">
+            Orbit<span className="ml-1 font-normal italic text-orange">360</span>
+          </span>
+        </Link>
+        <nav className="ml-6 hidden items-center gap-7 md:flex">
+          {NAV.map((n) => (
+            <NavItem key={n.to} {...n} />
+          ))}
+        </nav>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="flex h-9 items-center gap-2 rounded-[6px] border rule-strong px-3 text-[13px] text-muted transition hover:border-ink hover:text-ink"
           >
-            <Icon size={20} />
-            <span className="glass pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-medium text-[var(--text)] opacity-0 transition group-hover:opacity-100">
-              {label}
-            </span>
-          </NavLink>
+            <Search size={15} />
+            <span className="hidden sm:inline">Search apps</span>
+            <kbd className="ml-2 hidden font-mono text-[10px] lg:inline">{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="grid h-9 w-9 place-items-center rounded-[6px] border rule-strong text-muted transition hover:border-ink hover:text-ink"
+            aria-label={theme === 'paper' ? 'Switch to night theme' : 'Switch to paper theme'}
+            title={theme === 'paper' ? 'Night' : 'Paper'}
+          >
+            {theme === 'paper' ? <Moon size={15} /> : <Sun size={15} />}
+          </button>
+        </div>
+      </div>
+      <nav className="no-scrollbar flex gap-6 overflow-x-auto border-t rule px-4 py-3 md:hidden">
+        {NAV.map((n) => (
+          <NavItem key={n.to} {...n} compact />
         ))}
       </nav>
-      {pinned.length > 0 && (
-        <>
-          <div className="my-5 h-px w-8 bg-[var(--border)]" />
-          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-thin">
-            {pinned.slice(0, 6).map((a) => (
-              <a
-                key={a.id}
-                href={a.url || undefined}
-                target="_blank"
-                rel="noreferrer"
-                title={a.name}
-                className="grid h-10 w-10 place-items-center overflow-hidden rounded-xl font-display text-xs font-bold text-white transition hover:scale-110"
-                style={{ background: a.logo ? '#fff' : a.color }}
-              >
-                {a.logo ? <img src={a.logo} alt="" className="h-8 w-8 object-contain" /> : a.short}
-              </a>
-            ))}
-          </div>
-        </>
-      )}
-    </aside>
-  )
-}
-
-function MobileNav() {
-  return (
-    <nav className="glass fixed inset-x-3 bottom-3 z-40 flex justify-around rounded-2xl px-2 py-1.5 lg:hidden">
-      {NAV.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={to === '/'}
-          className={({ isActive }) => `flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 text-[10px] font-medium ${isActive ? 'text-orbit-orange' : 'text-muted'}`}
-        >
-          <Icon size={19} />
-          {label}
-        </NavLink>
-      ))}
-    </nav>
-  )
-}
-
-function TopBar() {
-  const { setPaletteOpen, setEditing, theme, toggleTheme } = useApps()
-  const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.platform)
-  return (
-    <header className="sticky top-0 z-30 px-4 pt-3 sm:px-6 lg:pl-[108px]">
-      <div className="glass flex h-14 items-center gap-3 rounded-2xl px-3 sm:px-4">
-        <NavLink to="/" className="flex items-center gap-2 lg:hidden">
-          <OrbitMark size={30} />
-        </NavLink>
-        <div className="hidden items-baseline gap-2 sm:flex">
-          <span className="font-display text-lg font-bold tracking-tight">
-            ORBIT <span className="gradient-text">360</span>
-          </span>
-          <span className="hidden text-xs text-muted md:inline">by Community Matters 2</span>
-        </div>
-        <button
-          onClick={() => setPaletteOpen(true)}
-          className="ml-auto flex h-10 w-full max-w-sm items-center gap-2 rounded-xl border border-soft px-3 text-sm text-muted transition hover:border-orbit-blue/50"
-        >
-          <Search size={16} />
-          <span className="flex-1 truncate text-left">Search the suite…</span>
-          <kbd className="hidden rounded-md border border-soft px-1.5 py-0.5 text-[10px] sm:inline">{isMac ? '⌘' : 'Ctrl'} K</kbd>
-        </button>
-        <button onClick={toggleTheme} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-soft text-muted hover:text-[var(--text)]" aria-label="Toggle theme">
-          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-        </button>
-        <button onClick={() => setEditing('new')} className="btn-primary h-10 shrink-0 px-3 sm:px-4">
-          <Plus size={16} /> <span className="hidden sm:inline">Add app</span>
-        </button>
-      </div>
     </header>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="relative mt-28 border-t rule">
+      <div className="wrap grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <OrbitMark size={34} />
+            <span className="font-display text-[26px] font-semibold tracking-tight">
+              Orbit<span className="ml-1 font-normal italic text-orange">360</span>
+            </span>
+          </div>
+          <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-muted">
+            The home for every Community Matters 2 application. Outcomes, Records, Behavioral Insights &amp; Tracking.
+          </p>
+        </div>
+        <div>
+          <div className="eyebrow mb-4">The suite</div>
+          <ul className="space-y-2 text-[14px]">
+            {SUITE.slice(0, 5).map((a) => (
+              <li key={a.id}>
+                <Link to={`/apps/${a.id}`} className="link-u">
+                  {a.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <div className="eyebrow mb-4">Explore</div>
+          <ul className="space-y-2 text-[14px]">
+            {NAV.map((n) => (
+              <li key={n.to}>
+                <Link to={n.to} className="link-u">
+                  {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <div className="eyebrow mb-4">Community Matters 2</div>
+          <a href="https://www.communitymatters2.org/" target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1 text-[14px]">
+            <span className="link-u">communitymatters2.org</span> <ArrowUpRight size={14} className="arrow" />
+          </a>
+        </div>
+      </div>
+      <div className="border-t rule">
+        <div className="wrap flex flex-col justify-between gap-2 py-5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted sm:flex-row">
+          <span>© {new Date().getFullYear()} Community Matters 2 Inc.</span>
+          <span>Outcomes · Records · Behavioral Insights · Tracking</span>
+        </div>
+      </div>
+    </footer>
   )
 }
 
 export default function Shell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
-  const full = pathname.startsWith('/open/')
+  if (pathname.startsWith('/open/')) return <>{children}</>
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      {!full && <TopBar />}
-      <main className={full ? 'lg:pl-[92px]' : 'px-4 pb-28 pt-6 sm:px-6 lg:pb-12 lg:pl-[108px]'}>{children}</main>
-      <MobileNav />
+    <div className="grain relative min-h-screen">
+      <Header />
+      <main className="relative z-[1]">{children}</main>
+      <Footer />
     </div>
   )
 }

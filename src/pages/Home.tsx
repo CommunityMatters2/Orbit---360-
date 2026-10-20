@@ -1,175 +1,163 @@
-import { motion } from 'framer-motion'
-import { ArrowRight, Clock, Command, Pin, Plus, Sparkles } from 'lucide-react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useApps } from '../store/useApps'
-import OrbitSystem from '../components/OrbitSystem'
-import AppCard from '../components/AppCard'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { indexOf, PILLARS, SUITE, tone } from '../data/apps'
+import Orrery from '../components/Orrery'
 import AppIcon from '../components/AppIcon'
-
-const PILLARS = [
-  { letter: 'O', word: 'Outcomes', color: '#1E5BD8', text: 'See what changes for the youth and families we serve.' },
-  { letter: 'R', word: 'Records', color: '#6CC04A', text: 'One trusted home for people, programs and places.' },
-  { letter: 'BI', word: 'Behavioral Insights', color: '#F58220', text: 'Understand what the community tells us, live.' },
-  { letter: 'T', word: 'Tracking', color: '#38BDF8', text: 'Follow every camp day, course and project.' },
-]
-
-function greeting() {
-  const h = new Date().getHours()
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'
-}
+import StatusBadge from '../components/StatusBadge'
 
 export default function Home() {
-  const { apps, recent, setDetails, setEditing, setPaletteOpen, launch } = useApps()
-  const pinned = apps.filter((a) => a.pinned)
-  const recentApps = recent.map((id) => apps.find((a) => a.id === id)).filter((a): a is NonNullable<typeof a> => !!a)
-  const live = apps.filter((a) => a.status === 'live').length
-  const building = apps.filter((a) => a.status !== 'live').length
-  const categories = new Set(apps.map((a) => a.category)).size
+  const [active, setActive] = useState<string | null>(null)
+  const live = SUITE.filter((a) => a.status === 'live').length
+  const stats = [
+    { n: SUITE.length, l: 'Apps in the suite' },
+    { n: live, l: 'Live today' },
+    { n: SUITE.length - live, l: 'In development' },
+    { n: new Set(SUITE.map((a) => a.category)).size, l: 'Areas served' },
+  ]
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <>
       {/* HERO */}
-      <section className="relative grid items-center gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative z-10 pt-4 lg:pt-0">
-          <div className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium">
-            <Sparkles size={14} className="text-orbit-orange" />
-            {greeting()} — welcome to the CM2 suite
-          </div>
-          <h1 className="mt-5 font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl xl:text-7xl">
-            Every CM2 app.
-            <br />
-            <span className="gradient-text">One orbit.</span>
-          </h1>
-          <p className="mt-5 max-w-lg text-lg text-muted">
-            Orbit 360 brings every Community Matters 2 tool into one launchpad — camps, academy, surveys, live walls and more. Open anything in a click, and
-            add new apps as the community grows.
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-1.5 font-display text-sm font-semibold">
+      <section className="wrap grid items-center gap-10 pb-10 pt-12 lg:grid-cols-[1.05fr_1fr] lg:gap-6 lg:pt-20">
+        <div>
+          <div className="rise eyebrow flex flex-wrap gap-x-3 gap-y-1">
             {PILLARS.map((p) => (
-              <span key={p.word} className="rounded-lg px-2.5 py-1" style={{ color: p.color, background: `${p.color}18` }}>
-                {p.word.split(' ').map((w, i) => (
-                  <span key={w}>
-                    {i > 0 && ' '}
-                    <span className="font-bold underline decoration-2 underline-offset-4">{w[0]}</span>
-                    {w.slice(1)}
-                  </span>
-                ))}
+              <span key={p.key} className="inline-flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: tone(p.tone) }} />
+                {p.title}
               </span>
             ))}
           </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/apps" className="btn-primary px-5 py-3 text-[15px]">
-              Explore the suite <ArrowRight size={17} />
+          <h1 className="rise mt-7 text-[46px] font-normal leading-[1.02] sm:text-[64px] xl:text-[80px]" style={{ animationDelay: '80ms' }}>
+            Every Community Matters&nbsp;2 tool, <em className="font-light italic text-orange">in one orbit.</em>
+          </h1>
+          <p className="rise mt-7 max-w-[34rem] text-[17px] leading-relaxed text-muted" style={{ animationDelay: '160ms' }}>
+            Orbit 360 is the home for the applications that power our programs: youth camp, academy, community surveys, live displays and more.
+            Find one, open it, and get to work.
+          </p>
+          <div className="rise mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '240ms' }}>
+            <Link to="/apps" className="btn-ink">
+              Browse the suite <ArrowRight size={16} className="arrow-r" />
             </Link>
-            <button onClick={() => setEditing('new')} className="btn-ghost px-5 py-3 text-[15px]">
-              <Plus size={17} /> Add an app
-            </button>
-            <button onClick={() => setPaletteOpen(true)} className="btn-ghost hidden px-4 py-3 sm:inline-flex" title="Command palette">
-              <Command size={16} /> K
-            </button>
+            <a href="https://www.communitymatters2.org/" target="_blank" rel="noreferrer" className="btn-line">
+              About Community Matters 2 <ArrowUpRight size={16} className="arrow" />
+            </a>
           </div>
-
-          <dl className="mt-10 grid max-w-md grid-cols-3 gap-3">
-            {[
-              { k: 'Apps live', v: live, c: '#6CC04A' },
-              { k: 'In the works', v: building, c: '#F58220' },
-              { k: 'Categories', v: categories, c: '#4F8BFF' },
-            ].map((s) => (
-              <div key={s.k} className="glass rounded-2xl p-4">
-                <dt className="text-[11px] uppercase tracking-wider text-muted">{s.k}</dt>
-                <dd className="mt-1 font-display text-3xl font-bold" style={{ color: s.c }}>
-                  {s.v}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, ease: 'easeOut' }} className="relative">
-          <OrbitSystem apps={apps} onSelect={setDetails} />
-        </motion.div>
+        </div>
+        <Orrery apps={SUITE} active={active} onActive={setActive} />
       </section>
 
-      {/* PINNED */}
-      <section className="mt-16">
-        <div className="mb-5 flex items-end justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-orbit-orange">
-              <Pin size={13} /> Pinned
+      {/* STATS */}
+      <section className="wrap">
+        <dl className="grid grid-cols-2 border-y rule md:grid-cols-4">
+          {stats.map((s, i) => (
+            <div key={s.l} className={`px-1 py-7 sm:px-6 ${i % 2 ? 'border-l rule' : ''} ${i > 1 ? 'border-t rule md:border-t-0' : ''} ${i === 2 ? 'md:border-l' : ''}`}>
+              <dt className="eyebrow">{s.l}</dt>
+              <dd className="mt-2 font-display text-[44px] font-light leading-none tracking-tight">{String(s.n).padStart(2, '0')}</dd>
             </div>
-            <h2 className="mt-1 font-display text-2xl font-bold">Your launchpad</h2>
+          ))}
+        </dl>
+      </section>
+
+      {/* INDEX */}
+      <section className="wrap mt-24">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="eyebrow">Index</div>
+            <h2 className="mt-3 text-[36px] font-normal leading-tight sm:text-[44px]">The suite</h2>
           </div>
-          <Link to="/apps" className="flex items-center gap-1 text-sm text-muted hover:text-[var(--text)]">
-            All apps <ArrowRight size={14} />
+          <Link to="/apps" className="group inline-flex items-center gap-1.5 text-[14px] font-medium">
+            <span className="link-u">View as cards</span> <ArrowRight size={15} className="arrow-r" />
           </Link>
         </div>
-        {pinned.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {pinned.map((a) => (
-              <AppCard key={a.id} app={a} />
-            ))}
-          </div>
-        ) : (
-          <div className="glass rounded-2xl p-8 text-center text-muted">Pin apps from the library to keep them here.</div>
-        )}
-      </section>
 
-      {/* RECENT */}
-      {recentApps.length > 0 && (
-        <section className="mt-14">
-          <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-            <Clock size={13} /> Recently launched
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-            {recentApps.map((a) => (
-              <button key={a.id} onClick={() => launch(a)} className="glass flex shrink-0 items-center gap-3 rounded-2xl py-2.5 pl-2.5 pr-5 transition hover:-translate-y-0.5">
-                <AppIcon app={a} size={36} />
-                <span className="text-sm font-medium">{a.name}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
+        <ol className="mt-10 border-t rule-strong">
+          {SUITE.map((a) => {
+            const on = active === a.id
+            return (
+              <li key={a.id} className="border-b rule" onMouseEnter={() => setActive(a.id)} onMouseLeave={() => setActive(null)}>
+                <Link
+                  to={`/apps/${a.id}`}
+                  onFocus={() => setActive(a.id)}
+                  onBlur={() => setActive(null)}
+                  className="group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 py-5 transition-[padding] duration-300 sm:grid-cols-[3rem_auto_1fr_10rem_10rem_auto] sm:gap-6 sm:hover:pl-3"
+                >
+                  <span
+                    className="absolute inset-y-0 left-0 w-[2px] origin-top transition-transform duration-300"
+                    style={{ background: tone(a.tone), transform: on ? 'scaleY(1)' : 'scaleY(0)' }}
+                  />
+                  <span className="hidden font-mono text-[12px] text-muted sm:block">{indexOf(a)}</span>
+                  <AppIcon app={a} size={44} />
+                  <span className="min-w-0">
+                    <span className="block truncate font-display text-[20px] leading-snug sm:text-[24px]">{a.name}</span>
+                    <span className="block truncate text-[14px] text-muted">{a.tagline}</span>
+                  </span>
+                  <span className="hidden font-mono text-[11px] uppercase tracking-[0.12em] text-muted sm:block">{a.category}</span>
+                  <span className="hidden sm:block">
+                    <StatusBadge status={a.status} />
+                  </span>
+                  <ArrowRight size={18} className="arrow-r text-muted group-hover:text-ink" />
+                </Link>
+              </li>
+            )
+          })}
+        </ol>
+      </section>
 
       {/* PILLARS */}
-      <section className="mt-16">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-orbit-green">What ORBIT stands for</div>
-        <h2 className="mt-1 font-display text-2xl font-bold">Outcomes, Records, Behavioral Insights &amp; Tracking</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="wrap mt-28">
+        <div className="eyebrow">What ORBIT stands for</div>
+        <h2 className="mt-3 max-w-3xl text-[36px] font-normal leading-tight sm:text-[44px]">
+          Four ways the suite helps us <em className="italic">see the whole community.</em>
+        </h2>
+        <div className="mt-12 grid border-t rule-strong sm:grid-cols-2 lg:grid-cols-4">
           {PILLARS.map((p, i) => (
-            <motion.div
-              key={p.word}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="glass group relative overflow-hidden rounded-2xl p-6"
+            <Link
+              key={p.key}
+              to={`/insights#${p.key}`}
+              className={`group relative py-8 pr-6 sm:px-6 ${i > 0 ? 'border-t rule sm:border-t-0' : ''} ${i % 2 ? 'sm:border-l' : ''} ${i === 2 ? 'sm:border-t lg:border-l lg:border-t-0' : ''} ${i === 3 ? 'sm:border-t lg:border-t-0' : ''} rule`}
             >
-              <div className="absolute -right-6 -top-8 font-display text-[120px] font-bold leading-none opacity-[0.08] transition group-hover:opacity-20" style={{ color: p.color }}>
+              <div className="font-display text-[72px] font-light italic leading-none" style={{ color: tone(p.tone) }}>
                 {p.letter}
               </div>
-              <div className="h-1 w-10 rounded-full" style={{ background: p.color }} />
-              <h3 className="mt-4 font-display text-lg font-semibold">{p.word}</h3>
-              <p className="mt-2 text-sm text-muted">{p.text}</p>
-            </motion.div>
+              <h3 className="mt-6 text-[22px] font-medium">{p.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted">{p.text}</p>
+              <span className="mt-5 inline-flex items-center gap-1 text-[13px] font-medium text-muted group-hover:text-ink">
+                {SUITE.filter((a) => a.pillars.includes(p.key)).length} apps <ArrowRight size={14} className="arrow-r" />
+              </span>
+            </Link>
           ))}
         </div>
-        <Link to="/insights" className="mt-5 inline-flex items-center gap-1 text-sm text-muted hover:text-[var(--text)]">
-          Open Insights <ArrowRight size={14} />
-        </Link>
       </section>
 
-      <footer className="mt-20 flex flex-col items-center gap-3 border-t border-soft pt-8 text-center text-xs text-muted sm:flex-row sm:justify-between sm:text-left">
-        <div className="flex items-center gap-3">
-          <img src="/logos/cm2.png" alt="" className="h-8 w-8 rounded-full bg-white" />
-          <span>Orbit 360 · Community Matters 2 Inc.</span>
+      {/* CLOSING BAND */}
+      <section className="wrap mt-28">
+        <div className="relative overflow-hidden rounded-[12px] border border-white/10 bg-[#101935] px-6 py-14 text-[#ECE8DE] sm:px-14">
+          <svg className="absolute -right-24 -top-24 h-[420px] w-[420px] opacity-[0.14]" viewBox="0 0 200 200" aria-hidden>
+            <circle cx="100" cy="100" r="30" fill="none" stroke="currentColor" />
+            <ellipse cx="100" cy="100" rx="90" ry="34" fill="none" stroke="currentColor" transform="rotate(-14 100 100)" />
+            <ellipse cx="100" cy="100" rx="64" ry="24" fill="none" stroke="currentColor" strokeDasharray="2 4" transform="rotate(-14 100 100)" />
+          </svg>
+          <div className="relative max-w-2xl">
+            <div className="font-mono text-[11px] uppercase tracking-[0.16em] opacity-60">Community Matters 2 Inc.</div>
+            <h2 className="mt-4 text-[34px] font-normal leading-tight sm:text-[44px]">
+              Built for the community, <em className="italic text-[#F29A55]">by the community.</em>
+            </h2>
+            <p className="mt-4 max-w-xl text-[16px] leading-relaxed opacity-70">
+              Every app in Orbit 360 exists to serve the youth, families and neighbors of Community Matters 2. Learn more about our mission and how to get involved.
+            </p>
+            <a
+              href="https://www.communitymatters2.org/"
+              target="_blank"
+              rel="noreferrer"
+              className="btn mt-8 bg-[#ECE8DE] text-[#101935] hover:bg-white"
+            >
+              Visit communitymatters2.org <ArrowUpRight size={16} className="arrow" />
+            </a>
+          </div>
         </div>
-        <a href="https://www.communitymatters2.org/" target="_blank" rel="noreferrer" className="hover:text-[var(--text)]">
-          communitymatters2.org
-        </a>
-      </footer>
-    </div>
+      </section>
+    </>
   )
 }

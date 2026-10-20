@@ -1,32 +1,29 @@
 /** @type {import('tailwindcss').Config} */
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`
+
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        orbit: {
-          navy: '#0B1B4D',
-          deep: '#050A1F',
-          blue: '#1E5BD8',
-          green: '#6CC04A',
-          orange: '#F58220',
-          gold: '#FCD34D',
-        },
+        paper: v('paper'),
+        surface: v('surface'),
+        ink: v('ink'),
+        muted: v('muted'),
+        line: v('line'),
+        blue: v('a-blue'),
+        green: v('a-green'),
+        orange: v('a-orange'),
+        gold: v('a-gold'),
+        plum: v('a-plum'),
+        teal: v('a-teal'),
       },
       fontFamily: {
-        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['"Schibsted Grotesk"', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
-      keyframes: {
-        spin: { to: { transform: 'rotate(360deg)' } },
-        floaty: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
-        pulseglow: { '0%,100%': { opacity: '0.55' }, '50%': { opacity: '1' } },
-      },
-      animation: {
-        floaty: 'floaty 6s ease-in-out infinite',
-        pulseglow: 'pulseglow 4s ease-in-out infinite',
-      },
+      maxWidth: { site: '1240px' },
     },
   },
   plugins: [],
