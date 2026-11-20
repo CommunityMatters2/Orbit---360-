@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Copy, PanelsTopLeft } from 'lucide-react'
-import { findApp, indexOf, PILLARS, SUITE, tone } from '../data/apps'
+import { findApp, grad, indexOf, PILLARS, SUITE, tone } from '../data/apps'
 import AppIcon from '../components/AppIcon'
 import StatusBadge from '../components/StatusBadge'
 import NotFound from './NotFound'
@@ -22,17 +22,18 @@ export default function AppDetail() {
         <ArrowLeft size={15} /> All apps
       </Link>
 
-      <section className="rise mt-8 grid gap-12 border-b rule-strong pb-14 lg:grid-cols-[1.4fr_1fr]">
+      <section className="rise relative isolate mt-8 grid gap-12 border-b rule-strong pb-14 lg:grid-cols-[1.4fr_1fr]">
+        <span className="pointer-events-none absolute -left-24 -top-24 -z-10 h-96 w-96 rounded-full blur-3xl" style={{ background: grad(app.tone, 0.35) }} />
         <div>
           <div className="flex items-center gap-4">
-            <AppIcon app={app} size={72} />
+            <AppIcon app={app} size={84} />
             <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
               No. {indexOf(app)}
               <br />
               {app.category}
             </div>
           </div>
-          <h1 className="mt-8 text-[44px] font-normal leading-[1.04] sm:text-[64px]">{app.name}</h1>
+          <h1 className="mt-8 text-[32px] font-bold leading-[1.08] sm:text-[48px]">{app.name}</h1>
           <p className="mt-6 max-w-2xl text-[18px] leading-relaxed text-muted">{app.description}</p>
           <div className="mt-9 flex flex-wrap gap-3">
             {app.url ? (
@@ -112,7 +113,7 @@ export default function AppDetail() {
               <Link key={a.id} to={`/apps/${a.id}`} className="card card-hover group flex items-center gap-4 p-5">
                 <AppIcon app={a} size={44} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-display text-[18px]">{a.name}</span>
+                  <span className="block truncate font-display text-[15px] font-semibold">{a.name}</span>
                   <span className="block truncate text-[13px] text-muted">{a.category}</span>
                 </span>
                 <ArrowRight size={16} className="arrow-r text-muted" />
@@ -125,7 +126,7 @@ export default function AppDetail() {
       <Link to={`/apps/${next.id}`} className="group mt-16 flex items-center justify-between border-y rule py-8">
         <span>
           <span className="eyebrow">Next · {indexOf(next)}</span>
-          <span className="mt-2 block font-display text-[28px] sm:text-[36px]">{next.name}</span>
+          <span className="mt-2 block font-display text-[22px] font-bold sm:text-[30px]">{next.name}</span>
         </span>
         <ArrowRight size={26} className="arrow-r text-muted group-hover:text-ink" />
       </Link>

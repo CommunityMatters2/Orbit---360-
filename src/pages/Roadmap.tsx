@@ -8,8 +8,8 @@ export default function Roadmap() {
       <header className="rise grid gap-6 border-b rule-strong pb-10 md:grid-cols-[1fr_auto] md:items-end">
         <div>
           <div className="eyebrow">Roadmap</div>
-          <h1 className="mt-4 text-[48px] font-normal leading-none sm:text-[68px]">
-            What’s <em className="italic">next</em>
+          <h1 className="mt-4 text-[44px] font-bold leading-none sm:text-[64px]">
+            What’s <em>next</em>
           </h1>
         </div>
         <p className="max-w-sm text-[15px] leading-relaxed text-muted">Where the suite is headed. Community Matters 2 updates this as work moves forward.</p>
@@ -22,7 +22,7 @@ export default function Roadmap() {
           return (
             <section key={s.key} className={`rise lg:px-6 ${i > 0 ? 'lg:border-l rule' : 'lg:pl-0'}`} style={{ animationDelay: `${i * 80}ms` }}>
               <div className="flex items-baseline justify-between border-b rule-strong pb-3">
-                <h2 className="flex items-center gap-2.5 text-[24px] font-normal">
+                <h2 className="flex items-center gap-2.5 text-[20px] font-bold">
                   <span className="h-2 w-2 rounded-full" style={{ background: t }} />
                   {s.title}
                 </h2>
@@ -31,8 +31,8 @@ export default function Roadmap() {
               <p className="eyebrow mt-3">{s.text}</p>
               <ul className="mt-5 space-y-3">
                 {items.map((r) => (
-                  <li key={r.title} className="card p-5" style={{ boxShadow: `inset 2px 0 0 ${t}` }}>
-                    <div className="font-display text-[18px] leading-snug">{r.title}</div>
+                  <li key={r.title} className="card p-5" style={{ boxShadow: `inset 3px 0 0 ${t}, 0 18px 40px -30px ${t}` }}>
+                    <div className="font-display text-[15px] font-semibold leading-snug">{r.title}</div>
                     <div className="mt-1 text-[14px] text-muted">{r.note}</div>
                   </li>
                 ))}

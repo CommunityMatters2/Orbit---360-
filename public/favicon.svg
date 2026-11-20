@@ -1,8 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#101935"/>
-  <ellipse cx="32" cy="32" rx="24" ry="10" fill="none" stroke="#ECE8DE" stroke-opacity=".55" stroke-width="1.5" transform="rotate(-20 32 32)"/>
-  <circle cx="32" cy="32" r="9" fill="none" stroke="#ECE8DE" stroke-width="2"/>
-  <circle cx="54" cy="24" r="3.5" fill="#E0701B"/>
-  <circle cx="11" cy="40" r="3" fill="#5BA846"/>
-  <circle cx="32" cy="32" r="3" fill="#4A72E0"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF8028"/>
+      <stop offset=".35" stop-color="#FF4896"/>
+      <stop offset=".65" stop-color="#AA64FF"/>
+      <stop offset="1" stop-color="#1EDCD2"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#070B1A"/>
+  <ellipse cx="32" cy="32" rx="25" ry="10" fill="none" stroke="#EEF1FF" stroke-opacity=".5" stroke-width="1.8" transform="rotate(-24 32 32)"/>
+  <circle cx="32" cy="32" r="12" fill="none" stroke="url(#g)" stroke-width="5"/>
+  <circle cx="32" cy="32" r="3.6" fill="#EEF1FF"/>
+  <circle cx="54" cy="21" r="4" fill="#FFCD32"/>
+  <circle cx="10" cy="43" r="3.4" fill="#1EDCD2"/>
 </svg>

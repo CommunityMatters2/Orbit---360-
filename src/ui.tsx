@@ -12,12 +12,12 @@ interface UI {
 const Ctx = createContext<UI | null>(null)
 
 export function UIProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => (document.documentElement.dataset.theme as Theme) || 'paper')
+  const [theme, setTheme] = useState<Theme>(() => (document.documentElement.dataset.theme as Theme) || 'night')
   const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'night' ? '#0C101E' : '#F4F1EA')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'night' ? '#070B1A' : '#F4F6FF')
     try {
       localStorage.setItem('orbit360.theme', theme)
     } catch {

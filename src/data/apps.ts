@@ -134,5 +134,10 @@ export const PILLARS: { key: Pillar; letter: string; title: string; tone: Tone; 
 ]
 
 export const tone = (t: Tone, alpha = 1) => `rgb(var(--a-${t}) / ${alpha})`
+
+// Each app color has a partner, so every app gets its own two-stop gradient.
+const PARTNER: Record<Tone, string> = { blue: 'plum', green: 'teal', orange: 'pink', gold: 'orange', plum: 'pink', teal: 'blue' }
+export const partner = (t: Tone, alpha = 1) => `rgb(var(--a-${PARTNER[t]}) / ${alpha})`
+export const grad = (t: Tone, alpha = 1, angle = 135) => `linear-gradient(${angle}deg, ${tone(t, alpha)}, ${partner(t, alpha)})`
 export const indexOf = (app: OrbitApp) => String(SUITE.indexOf(app) + 1).padStart(2, '0')
 export const findApp = (id?: string) => SUITE.find((a) => a.id === id)

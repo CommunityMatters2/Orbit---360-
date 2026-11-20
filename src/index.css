@@ -2,67 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Colors are RGB triplets so Tailwind can apply opacity (e.g. bg-ink/5). */
+/*
+ * ORBIT 360 — "Mission control" identity.
+ * Deep navy space (from the ORBIT wordmark) lit by the full spectrum of the
+ * CM2 wristband: every app owns a color and a two-stop gradient.
+ * Colors are RGB triplets so Tailwind can apply opacity (e.g. bg-ink/5).
+ */
 :root,
-[data-theme='paper'] {
-  --paper: 244 241 234; /* warm page */
-  --surface: 251 250 246; /* cards */
-  --ink: 16 25 53; /* deep navy from the ORBIT wordmark */
-  --muted: 94 100 118;
-  --line: 16 25 53; /* used at low alpha */
-  --a-blue: 37 80 200;
-  --a-green: 63 132 47;
-  --a-orange: 206 98 20;
-  --a-gold: 168 128 18;
-  --a-plum: 118 78 160;
-  --a-teal: 22 122 122;
-  --core-ring: 16 25 53;
-  color-scheme: light;
-}
 [data-theme='night'] {
-  --paper: 12 16 30;
-  --surface: 19 25 43;
-  --ink: 236 232 222;
-  --muted: 150 156 172;
-  --line: 236 232 222;
-  --a-blue: 126 160 255;
-  --a-green: 139 200 115;
-  --a-orange: 242 154 85;
-  --a-gold: 226 190 92;
-  --a-plum: 186 156 232;
-  --a-teal: 102 200 196;
-  --core-ring: 236 232 222;
+  --paper: 7 11 26; /* deep space */
+  --surface: 15 21 44; /* panels */
+  --ink: 238 241 255;
+  --muted: 148 158 196;
+  --line: 160 175 255; /* used at low alpha, slightly blue */
+  --a-blue: 77 139 255;
+  --a-green: 52 214 130;
+  --a-orange: 255 128 40;
+  --a-gold: 255 205 50;
+  --a-plum: 170 100 255;
+  --a-teal: 30 220 210;
+  --a-pink: 255 72 150;
+  --glow: 1;
+  --grid: 0.07;
   color-scheme: dark;
+}
+[data-theme='paper'] {
+  --paper: 244 246 255; /* cool daylight */
+  --surface: 255 255 255;
+  --ink: 10 14 40;
+  --muted: 84 92 128;
+  --line: 40 50 120;
+  --a-blue: 36 99 235;
+  --a-green: 10 160 90;
+  --a-orange: 234 98 12;
+  --a-gold: 202 138 4;
+  --a-plum: 130 60 230;
+  --a-teal: 8 150 150;
+  --a-pink: 226 40 120;
+  --glow: 0.55;
+  --grid: 0.08;
+  color-scheme: light;
 }
 
 html {
   background: rgb(var(--paper));
+  overflow-x: clip; /* the tilted signal strip must never widen the page */
 }
 body {
   background: rgb(var(--paper));
   color: rgb(var(--ink));
-  font-family: 'Schibsted Grotesk', system-ui, sans-serif;
-  font-feature-settings: 'ss01', 'cv11';
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 ::selection {
-  background: rgb(var(--a-orange) / 0.25);
+  background: rgb(var(--a-pink) / 0.35);
 }
 
 @layer base {
   h1,
   h2,
   h3 {
-    font-family: Fraunces, Georgia, serif;
-    font-optical-sizing: auto;
-    letter-spacing: -0.02em;
+    font-family: Unbounded, 'Arial Black', system-ui, sans-serif;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  /* Emphasis inside headings becomes the spectrum gradient. */
+  h1 em,
+  h2 em {
+    font-style: normal;
+    background: linear-gradient(90deg, rgb(var(--a-orange)), rgb(var(--a-pink)), rgb(var(--a-plum)), rgb(var(--a-blue)), rgb(var(--a-teal)), rgb(var(--a-orange)));
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: spectrum 9s linear infinite;
   }
   :focus-visible {
-    outline: 2px solid rgb(var(--a-blue));
+    outline: 2px solid rgb(var(--a-teal));
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 }
 
@@ -74,28 +94,53 @@ body {
     border-color: rgb(var(--line) / 0.12);
   }
   .rule-strong {
-    border-color: rgb(var(--line) / 0.28);
+    border-color: rgb(var(--line) / 0.26);
   }
   .eyebrow {
-    @apply font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted;
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted;
   }
+  .text-spectrum {
+    background: linear-gradient(90deg, rgb(var(--a-orange)), rgb(var(--a-pink)), rgb(var(--a-plum)), rgb(var(--a-blue)), rgb(var(--a-teal)), rgb(var(--a-orange)));
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: spectrum 9s linear infinite;
+  }
+  .bg-spectrum {
+    background: linear-gradient(100deg, rgb(var(--a-orange)), rgb(var(--a-pink)) 30%, rgb(var(--a-plum)) 55%, rgb(var(--a-blue)) 78%, rgb(var(--a-teal)));
+  }
+
   .btn {
-    @apply inline-flex h-11 items-center justify-center gap-2 rounded-[6px] px-5 text-[14px] font-semibold transition-[background,color,border-color,transform] duration-200;
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[14px] font-semibold transition-[background,color,border-color,transform,box-shadow] duration-200;
   }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  /* Primary: spectrum fill with a soft glow. */
   .btn-ink {
-    @apply btn bg-ink text-paper;
+    @apply btn text-white;
+    background: linear-gradient(100deg, rgb(var(--a-orange)), rgb(var(--a-pink)) 45%, rgb(var(--a-plum)));
+    background-size: 160% 100%;
+    background-position: 0 0;
+    box-shadow: 0 10px 34px -10px rgb(var(--a-pink) / calc(0.75 * var(--glow))), inset 0 1px 0 rgb(255 255 255 / 0.25);
   }
   .btn-ink:hover {
-    background: rgb(var(--ink) / 0.86);
+    background-position: 100% 0;
+    box-shadow: 0 14px 44px -10px rgb(var(--a-plum) / calc(0.9 * var(--glow))), inset 0 1px 0 rgb(255 255 255 / 0.3);
   }
   .btn-line {
-    @apply btn border text-ink;
+    @apply btn border text-ink backdrop-blur-md;
+    background: rgb(var(--surface) / 0.5);
     border-color: rgb(var(--line) / 0.28);
   }
   .btn-line:hover {
-    border-color: rgb(var(--ink));
+    border-color: rgb(var(--a-teal) / 0.8);
+    box-shadow: 0 0 0 4px rgb(var(--a-teal) / 0.12);
   }
-  .btn .arrow {
+  .btn .arrow,
+  .arrow,
+  .arrow-r {
     transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
   .btn:hover .arrow,
@@ -106,27 +151,38 @@ body {
   .group:hover .arrow-r {
     transform: translateX(4px);
   }
-  .arrow-r {
-    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
-  }
+
+  /* Panels: translucent glass over the space background. */
   .card {
-    @apply rounded-[10px] border bg-surface transition-[border-color,transform,box-shadow] duration-300;
-    border-color: rgb(var(--line) / 0.12);
+    @apply rounded-[20px] border backdrop-blur-xl transition-[border-color,transform,box-shadow] duration-300;
+    background: linear-gradient(160deg, rgb(var(--surface) / 0.92), rgb(var(--surface) / 0.7));
+    border-color: rgb(var(--line) / 0.14);
   }
   .card-hover:hover {
-    border-color: rgb(var(--line) / 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 18px 40px -28px rgb(var(--ink) / 0.45);
+    border-color: rgb(var(--line) / 0.38);
+    transform: translateY(-4px);
+    box-shadow: 0 28px 60px -30px rgb(var(--a-plum) / calc(0.6 * var(--glow)));
+  }
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.14em];
+    border-color: rgb(var(--line) / 0.2);
+    background: rgb(var(--surface) / 0.6);
   }
   .link-u {
-    background-image: linear-gradient(currentColor, currentColor);
-    background-size: 0% 1px;
+    background-image: linear-gradient(90deg, rgb(var(--a-pink)), rgb(var(--a-teal)));
+    background-size: 0% 2px;
     background-position: 0 100%;
     background-repeat: no-repeat;
     transition: background-size 0.3s ease;
   }
   .link-u:hover {
-    background-size: 100% 1px;
+    background-size: 100% 2px;
+  }
+}
+
+@keyframes spectrum {
+  to {
+    background-position: 250% 0;
   }
 }
 
@@ -134,7 +190,7 @@ body {
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -142,7 +198,7 @@ body {
   }
 }
 .rise {
-  animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 @keyframes fade {
   from {
@@ -152,16 +208,61 @@ body {
 .fade {
   animation: fade 1.2s ease both;
 }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin 14s linear infinite;
+}
+.spin-sweep {
+  animation: spin 6s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 38s linear infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+.blink {
+  animation: blink 1.6s steps(2) infinite;
+}
 
-/* Subtle paper grain for the aura. */
-.grain::before {
+/* Ambient space: aurora glows + a fine technical grid, fixed behind everything. */
+.space {
+  overflow-x: clip;
+}
+.space::before,
+.space::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.space::before {
+  opacity: var(--glow);
+  background:
+    radial-gradient(38rem 26rem at 8% -6%, rgb(var(--a-plum) / 0.32), transparent 70%),
+    radial-gradient(34rem 24rem at 92% 4%, rgb(var(--a-teal) / 0.22), transparent 70%),
+    radial-gradient(40rem 30rem at 70% 105%, rgb(var(--a-pink) / 0.18), transparent 70%),
+    radial-gradient(30rem 22rem at 0% 90%, rgb(var(--a-blue) / 0.2), transparent 70%);
+}
+.space::after {
+  background-image:
+    linear-gradient(rgb(var(--line) / var(--grid)) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--line) / var(--grid)) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 85%);
 }
 
 .no-scrollbar::-webkit-scrollbar {
