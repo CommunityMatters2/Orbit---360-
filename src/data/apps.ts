@@ -124,6 +124,19 @@ export const SUITE: OrbitApp[] = [
     pillars: ['records'],
     logo: '/logos/cm2.png',
   },
+  {
+    id: 'christmas-in-focus',
+    name: 'Christmas in Focus',
+    short: 'XF',
+    url: 'https://christmasinfocuscm2.vercel.app/',
+    tagline: 'Book your slot for a Christmas portrait shoot.',
+    description:
+      'Families and community members pick a time and book a slot for the Community Matters 2 Christmas portrait shoot, so every session runs on schedule.',
+    category: 'Events',
+    status: 'live',
+    tone: 'green',
+    pillars: ['records', 'tracking'],
+  },
 ]
 
 export const PILLARS: { key: Pillar; letter: string; title: string; tone: Tone; text: string }[] = [

@@ -22,7 +22,15 @@ export default function Home() {
   const hero = SUITE.find((a) => a.featured) ?? SUITE[0]
   const rest = SUITE.filter((a) => a !== hero)
   const tail = rest.slice(4)
-  const tailSpan = tail.length === 1 ? 'lg:col-span-4' : tail.length === 2 ? 'lg:col-span-2' : tail.length === 4 ? '' : ''
+  // Widen tiles in the final row so it always fills all four columns.
+  const lastRow = tail.length % 4
+  const lastStart = tail.length - lastRow
+  const spanFor = (i: number) => {
+    if (i < lastStart || lastRow === 0) return ''
+    if (lastRow === 1) return 'lg:col-span-4'
+    if (lastRow === 2) return 'lg:col-span-2'
+    return i === lastStart ? 'lg:col-span-2' : ''
+  }
 
   return (
     <>
@@ -119,8 +127,8 @@ export default function Home() {
           {rest.slice(0, 4).map((a) => (
             <AppTile key={a.id} app={a} onHover={setActive} />
           ))}
-          {tail.map((a) => (
-            <AppTile key={a.id} app={a} className={tailSpan} onHover={setActive} />
+          {tail.map((a, i) => (
+            <AppTile key={a.id} app={a} className={spanFor(i)} onHover={setActive} />
           ))}
         </div>
       </section>

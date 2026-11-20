@@ -33,6 +33,7 @@ To add an app, copy an existing entry in `SUITE`, change its fields, then commit
 | Community Input Survey | https://cm2-survey.vercel.app/ |
 | Opinion Live Wall | https://cm2-survey.vercel.app/display |
 | CM2 Website | https://www.communitymatters2.org/ |
+| Christmas in Focus (portrait shoot booking) | https://christmasinfocuscm2.vercel.app/ |
 
 ## Development
 
